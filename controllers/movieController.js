@@ -7,6 +7,23 @@ export const getMovies = async (req, res) => {
   res.json(movies);
 };
 
+export const getMovieById = async (req, res) => {
+  try {
+
+    const movie = await Movie.findById(req.params.id)
+      .populate("category");
+
+    if (!movie) {
+      return res.status(404).json("Movie not found");
+    }
+
+    res.json(movie);
+
+  } catch (err) {
+    res.status(500).json(err.message);
+  }
+};
+
 // ADD MOVIE
 export const addMovie = async (req, res) => {
   try {

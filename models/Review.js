@@ -13,7 +13,16 @@ const reviewSchema = new mongoose.Schema({
     type: Number,
     required: true
   },
+
   comment: String,
+
+  status: {
+    type: String,
+    enum: ["approved", "flagged"],
+    default: "approved"
+  },
+
+
   review_date: {
     type: Date,
     default: Date.now

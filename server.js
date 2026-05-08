@@ -8,6 +8,8 @@ import adminRoutes from "./routes/adminRoutes.js";
 import subscriptionRoutes from "./routes/subscriptionRoutes.js";
 import paymentRoutes from "./routes/paymentRoutes.js"
 import userRoutes from "./routes/userRoutes.js";
+import reviewRoutes from "./routes/reviewRoutes.js";
+
 dotenv.config();
 
 const app = express();
@@ -25,6 +27,8 @@ app.use("/api/subscriptions", subscriptionRoutes);
 app.use("/api/payments", paymentRoutes);
 
 app.use("/api/users", userRoutes);
+
+app.use("/api/reviews", reviewRoutes);
 
 
 // connect MongoDB

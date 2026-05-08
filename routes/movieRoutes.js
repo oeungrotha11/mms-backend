@@ -5,7 +5,8 @@ import {
   deleteMovie,
   getCategories,
   addCategory,
-  getCategoriesWithCount
+  getCategoriesWithCount,
+  getMovieById
 } from "../controllers/movieController.js";
 
 import { verifyToken } from "../middleware/authMiddleware.js";
@@ -22,6 +23,7 @@ router.get("/categories/with-count", getCategoriesWithCount);
 //movies route
 // router.get("/", verifyToken, getMovies);
 router.get("/", verifyToken, requireSubscription, getMovies);
+router.get("/:id", getMovieById);
 
 // ADMIN ONLY
 router.post("/", verifyToken, isAdmin, addMovie);
