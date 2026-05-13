@@ -1,10 +1,89 @@
 import Movie from "../models/Movie.js";
 import Category from "../models/Category.js";
+import Review from "../models/Review.js";
+import mongoose from "mongoose";
 
 // GET ALL MOVIES
 export const getMovies = async (req, res) => {
-  const movies = await Movie.find();
-  res.json(movies);
+  try {
+
+    const { search, category, quality, limit: queryLimit } = req.query;
+
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(queryLimit) || 20;
+    const skip = (page - 1) * limit;
+
+    let filter = {};
+
+    // SEARCH
+    if (search) {
+      filter.title = { $regex: search, $options: "i" };
+    }
+
+    // CATEGORY (IMPORTANT FIX)
+    if (category && mongoose.Types.ObjectId.isValid(category)) {
+
+      filter["category._id"] =
+        new mongoose.Types.ObjectId(category);
+
+    }
+
+    if (quality) {
+      filter.quality = quality;
+    }
+
+    // COUNT (BEFORE PAGINATION)
+    const total = await Movie.countDocuments(filter);
+
+    // DATA
+    const movies = await Movie.find(filter)
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: -1 });
+
+    const movieIds = movies.map(m => m._id);
+
+    const ratings = await Review.aggregate([
+      {
+        $match: {
+          movie: { $in: movieIds }
+        }
+      },
+      {
+        $group: {
+          _id: "$movie",
+          avgRating: {
+            $avg: "$rating"
+          }
+        }
+      }
+    ]);
+
+    const ratingMap = {};
+
+    ratings.forEach(r => {
+      ratingMap[r._id.toString()] = r.avgRating;
+    });
+
+    const result = movies.map(movie => ({
+      ...movie.toObject(),
+      avgRating:
+        ratingMap[movie._id.toString()] || 0
+    }));
+
+    const totalPages = Math.ceil(total / limit);
+
+
+    res.json({
+      movies: result,
+      total,
+      totalPages,
+      page
+    });
+
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 };
 
 export const getMovieById = async (req, res) => {
@@ -32,6 +111,25 @@ export const addMovie = async (req, res) => {
     res.status(201).json(saved);
   } catch (err) {
     res.status(500).json({ error: err.message });
+  }
+};
+
+// UPDATE MOVIE
+export const updateMovie = async (req, res) => {
+  try {
+
+    const updated = await Movie.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
+
+    res.json(updated);
+
+  } catch (err) {
+    res.status(500).json({
+      message: err.message
+    });
   }
 };
 

@@ -14,12 +14,22 @@ const movieSchema = new mongoose.Schema({
   language: String,
 
   category: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Category"
+    name: String,
+    _id: mongoose.Schema.Types.ObjectId
   },
 
   poster_url: String,
   trailer_url: String,
+
+  quality: {
+    type: String,
+    default: "HD"
+  },
+
+  status: {
+    type: String,
+    default: "Active"
+  },
 
   created_at: {
     type: Date,
