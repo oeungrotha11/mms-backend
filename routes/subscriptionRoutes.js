@@ -3,6 +3,7 @@ import {
   getPlans,
   addPlan,
   deletePlan,
+  updatePlan,
   getSubscriptions,
   createSubscription,
   cancelSubscription
@@ -16,6 +17,7 @@ const router = express.Router();
 // PLANS
 router.get("/plans", getPlans);
 router.post("/plans", verifyToken, isAdmin, addPlan);
+router.put("/plans/:id", verifyToken, isAdmin, updatePlan);
 router.delete("/plans/:id", verifyToken, isAdmin, deletePlan);
 
 // SUBSCRIPTIONS

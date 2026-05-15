@@ -122,6 +122,18 @@ export const updateCategory = async (req, res) => {
   }
 };
 
+export const deleteCategory = async (req, res) => {
+  try {
+    const deletedCategory = await Category.findByIdAndDelete(req.params.id);
+    if (!deletedCategory) {
+      return res.status(404).json({ message: "Category not found" });
+    }
+    res.json({ message: "Category deleted" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
 export const getMovieById = async (req, res) => {
   try {
 

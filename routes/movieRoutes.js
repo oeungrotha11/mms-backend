@@ -8,7 +8,8 @@ import {
   getCategoriesWithCount,
   getMovieById,
   updateMovie,
-  updateCategory
+  updateCategory,
+  deleteCategory
 } from "../controllers/movieController.js";
 
 import { verifyToken } from "../middleware/authMiddleware.js";
@@ -19,8 +20,9 @@ const router = express.Router();
 
 // categories route
 router.get("/categories", getCategories);
-router.post("/categories", addCategory);
-router.put("/categories/:id",updateCategory);
+router.post("/categories", verifyToken, isAdmin, addCategory);
+router.put("/categories/:id", verifyToken, isAdmin, updateCategory);
+router.delete("/categories/:id", verifyToken, isAdmin, deleteCategory);
 router.get("/categories/with-count", getCategoriesWithCount);
 
 //movies route

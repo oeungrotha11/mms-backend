@@ -44,6 +44,42 @@ export const deletePlan = async (req, res) => {
   res.json({ message: "Plan deleted" });
 };
 
+// UPDATE PLAN
+export const updatePlan = async (req, res) => {
+  try {
+    const updateData = {};
+
+    ['name', 'quality', 'description'].forEach((field) => {
+      if (req.body[field] !== undefined) {
+        updateData[field] = req.body[field];
+      }
+    });
+
+    if (req.body.price !== undefined) {
+      updateData.price = Number(req.body.price);
+    }
+    if (req.body.duration_days !== undefined) {
+      updateData.duration_days = Number(req.body.duration_days);
+    }
+    if (req.body.devices !== undefined) {
+      updateData.devices = Number(req.body.devices);
+    }
+
+    const updated = await Plan.findByIdAndUpdate(
+      req.params.id,
+      updateData,
+      { new: true }
+    );
+
+    if (!updated) {
+      return res.status(404).json({ message: "Plan not found" });
+    }
+
+    res.json(updated);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
 
 // ================= SUBSCRIPTION =================
 
