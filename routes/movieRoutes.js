@@ -7,7 +7,8 @@ import {
   addCategory,
   getCategoriesWithCount,
   getMovieById,
-  updateMovie
+  updateMovie,
+  updateCategory
 } from "../controllers/movieController.js";
 
 import { verifyToken } from "../middleware/authMiddleware.js";
@@ -19,6 +20,7 @@ const router = express.Router();
 // categories route
 router.get("/categories", getCategories);
 router.post("/categories", addCategory);
+router.put("/categories/:id",updateCategory);
 router.get("/categories/with-count", getCategoriesWithCount);
 
 //movies route

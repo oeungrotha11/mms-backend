@@ -21,11 +21,15 @@ export const getMovies = async (req, res) => {
     }
 
     // CATEGORY (IMPORTANT FIX)
-    if (category && mongoose.Types.ObjectId.isValid(category)) {
-
-      filter["category._id"] =
-        new mongoose.Types.ObjectId(category);
-
+    if (category) {
+      if (mongoose.Types.ObjectId.isValid(category)) {
+        filter.$or = [
+          { "category._id": new mongoose.Types.ObjectId(category) },
+          { category }
+        ];
+      } else {
+        filter.category = category;
+      }
     }
 
     if (quality) {
@@ -86,6 +90,38 @@ export const getMovies = async (req, res) => {
   }
 };
 
+// UPDATE CATEGORY
+export const updateCategory = async (req, res) => {
+  try {
+
+    const updatedCategory =
+      await Category.findByIdAndUpdate(
+        req.params.id,
+        {
+          name: req.body.name
+        },
+        {
+          new: true
+        }
+      );
+
+    if (!updatedCategory) {
+      return res.status(404).json({
+        message: "Category not found"
+      });
+    }
+
+    res.json(updatedCategory);
+
+  } catch (err) {
+
+    res.status(500).json({
+      message: err.message
+    });
+
+  }
+};
+
 export const getMovieById = async (req, res) => {
   try {
 
@@ -117,10 +153,21 @@ export const addMovie = async (req, res) => {
 // UPDATE MOVIE
 export const updateMovie = async (req, res) => {
   try {
+    const updateData = { ...req.body };
+
+    if (typeof updateData.category === "string" && mongoose.Types.ObjectId.isValid(updateData.category)) {
+      const category = await Category.findById(updateData.category);
+      if (category) {
+        updateData.category = {
+          _id: category._id,
+          name: category.name
+        };
+      }
+    }
 
     const updated = await Movie.findByIdAndUpdate(
       req.params.id,
-      req.body,
+      updateData,
       { new: true }
     );
 
